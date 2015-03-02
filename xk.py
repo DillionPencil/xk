@@ -34,7 +34,7 @@ def get_img(imgurl):
     img = urllib2.urlopen(imgurl)
     text = img.read()
     time.sleep(3)
-    with open('/home/dillion/bin/login_img.jpg' , 'wb') as f:
+    with open('./img.jpg' , 'wb') as f:
         f.write(text)
         f.close()
     image = Image.open(StringIO.StringIO(text))
@@ -108,7 +108,7 @@ while True:
     response = urllib2.urlopen(request)
     
     text = response.read()
-    with open('/home/dillion/bin/result.html' , 'wb') as f:
+    with open('./result.html' , 'wb') as f:
         f.write(text)
         f.close()
     alert_begin_pos = 298
