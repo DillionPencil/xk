@@ -1,4 +1,6 @@
 # -*- coding=utf-8 -*-
+# xk.py
+# python 2.6.7
 __author__ = 'DillionWang'
 
 import StringIO
@@ -11,15 +13,11 @@ import string
 import re
 import time
 from PIL import Image
-#from sys import path
-#import os
-#path.append(os.path.abspath('./translate/'))
 import translate
 
 
 print 'Welcome to DillionWang\'s xk system (version:1.0 , 15.2.21)'
 print ' ---*--- 猫猫抓课机 ---*--- '
-# print 'Please input the information by the tips'
 
 ID = '13307130109'
 PW = '3223232a'
@@ -33,7 +31,9 @@ urllib2.install_opener(opener)
 def get_img(imgurl):
     img = urllib2.urlopen(imgurl)
     text = img.read()
+
     time.sleep(3)
+
     with open('./img.jpg' , 'wb') as f:
         f.write(text)
         f.close()
@@ -66,23 +66,30 @@ while True:
     response = urllib2.urlopen(request)
     
     text = response.read()
-    # pos = 1134
-    # print text.find('验证码不正确!')
-    # print text[1134:1137]
-    # if text.find('验证码不正确!') != -1:
-    if text[1134:1137] == '验' :
-        print 'wrong rand while login'
+    
+    alert_begin_pos = 1134
+    alert_end_pos = text.find(')' , 1134)
+    alert = text[alert_begin_pos : alert_end_pos-1]
+    print alert
+    if alert == 'Log-in failed. Username does not exsit or wrong password.':
+        print 'please check your data'
+        print 'exiting the program'
+        exit()
+    if alert == 'Input student ID number in appropriate digits':
+        print 'please check your data'
+        print 'exiting the program'
+        exit()
+    if alert == '验证码不正确!':
+        print 'trying again'
         continue
-    # with open('./login_response.html','wb') as f:
-    #     f.write(text)
-    #     f.close()
+    with open('./login_response.html','wb') as f:
+         f.write(text)
+         f.close()
     break
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
 print 'login successfully'
-# print 'please input one class code you want to choose:'
-# class_code = raw_input()
-# class_code = 'COMP130007.01'
 
 while True:
     xk_url = 'http://xk.fudan.edu.cn/xk/input.jsp'
