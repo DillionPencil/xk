@@ -1,3 +1,4 @@
+# -*- coding=utf-8 -*-
 # translate.py
 # python 2.7.6
 __author__ = 'DillionWang'

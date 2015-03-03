@@ -1,0 +1,9 @@
+*~
+*.jpg
+libsvm-3.20/
+login_data.txt
+login_response.html
+result.html
+svm_data
+tmp.py
+*.pyc

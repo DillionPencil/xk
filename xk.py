@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 # xk.py
-# python 2.6.7
+# python 2.7.6
 __author__ = 'DillionWang'
 
 import StringIO
@@ -19,9 +19,15 @@ import translate
 print 'Welcome to DillionWang\'s xk system (version:1.0 , 15.2.21)'
 print ' ---*--- 猫猫抓课机 ---*--- '
 
-ID = '13307130109'
-PW = '3223232a'
-class_code = 'COMP130007.01'
+#ID = '13307130109'
+#PW = '3223232a'
+#class_code = 'COMP130007.01'
+
+with open('./login_data.txt' , 'rb') as f:
+    ID = f.readline()[0:11]
+    PW = f.readline()
+    PW = PW[0:len(PW) - 1]
+    class_code = f.readline()[0:13]
 
 cj = cookielib.LWPCookieJar()
 cookie_suppert = urllib2.HTTPCookieProcessor(cj)
