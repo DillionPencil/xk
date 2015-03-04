@@ -19,9 +19,9 @@ import translate
 print 'Welcome to DillionWang\'s xk system (version:1.0 , 15.2.21)'
 print ' ---*--- 猫猫抓课机 ---*--- '
 
-#ID = '13307130109'
-#PW = '3223232a'
-#class_code = 'COMP130007.01'
+#ID = 'Your ID'
+#PW = 'Your Password'
+#class_code = 'Course Code'
 
 with open('./login_data.txt' , 'rb') as f:
     ID = f.readline()[0:11]
@@ -30,8 +30,8 @@ with open('./login_data.txt' , 'rb') as f:
     class_code = f.readline()[0:13]
 
 cj = cookielib.LWPCookieJar()
-cookie_suppert = urllib2.HTTPCookieProcessor(cj)
-opener = urllib2.build_opener(cookie_suppert , urllib2.HTTPHandler)
+cookie_support = urllib2.HTTPCookieProcessor(cj)
+opener = urllib2.build_opener(cookie_support , urllib2.HTTPHandler)
 urllib2.install_opener(opener)
 
 def get_img(imgurl):
