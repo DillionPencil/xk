@@ -43,14 +43,19 @@ def pic2words(img):
                         top = y
                     if (bottom < y):
                         bottom = y
+        
         tmp = bottom - top - 12
         bottom -= tmp / 2
         top += tmp - tmp / 2
+        #print 'top: %d' % top
+        #print 'bottom: %d' % bottom
         # turn into svm format data
         z = 1
         for x in range(l , l + 10):
             for y in range(top , bottom):
-                if not_blank(img.getpixel((x,y))):
+                if y < 0 or y > 23:
+                    svm_f.write('%d:%.3f ' % (z , 0.001))
+                elif not_blank(img.getpixel((x,y))):
                     svm_f.write('%d:%.3f ' % (z , 0.999))
                 else:
                     svm_f.write('%d:%.3f ' % (z , 0.001))

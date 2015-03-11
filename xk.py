@@ -58,8 +58,12 @@ while True:
                'Referer':'http://xk.fudan.edu.cn/xk'
            }
     
-    login_rand = get_img(login_img_url)
-    print 'login_rand:' + login_rand
+    try:
+        login_rand = get_img(login_img_url)
+        print 'login_rand:' + login_rand
+    except:
+        print '** bad_image'
+        continue
     
     login_post_data = {'studentId':ID,
                        'password':PW,
@@ -76,16 +80,18 @@ while True:
     alert_begin_pos = 1134
     alert_end_pos = text.find(')' , 1134)
     alert = text[alert_begin_pos : alert_end_pos-1]
-    print alert
     if alert == 'Log-in failed. Username does not exsit or wrong password.':
+        print alert
         print 'please check your data'
         print 'exiting the program'
         exit()
     if alert == 'Input student ID number in appropriate digits':
+        print alert
         print 'please check your data'
         print 'exiting the program'
         exit()
     if alert == '验证码不正确!':
+        print alert
         print 'trying again'
         continue
     with open('./login_response.html','wb') as f:
@@ -95,7 +101,7 @@ while True:
 
 # -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 
-print 'login successfully'
+print '* login successfully *'
 
 while True:
     xk_url = 'http://xk.fudan.edu.cn/xk/input.jsp'
@@ -107,8 +113,11 @@ while True:
     img_pos = 2671
     token_number = text[2686:2690]
     xk_img_url = 'http://xk.fudan.edu.cn/xk/image.do?token=' + token_number
-    xk_rand = get_img(xk_img_url)
-    print 'xk_rand:' + xk_rand
+    try :
+        xk_rand = get_img(xk_img_url)
+        print 'xk_rand:' + xk_rand
+    except :
+        print '* bad image *'
     
     xk_post_data = {'token':token_number,
                     'selectionId':str(class_code),
@@ -125,8 +134,8 @@ while True:
         f.write(text)
         f.close()
     alert_begin_pos = 298
-    alert_end_pos = text.find(')' , 298)
-    alert = text[alert_begin_pos : alert_end_pos-1]
+    alert_end_pos = text.find('");' , 298)
+    alert = text[alert_begin_pos : alert_end_pos]
     print alert
     if alert == 'Course added' :
         print 'exiting the program'
@@ -138,3 +147,7 @@ while True:
         print 'Please check your course code'
         print 'exiting the program'
         exit()
+    if alert.find(str(class_code)) != -1 :
+        print 'exiting the program'
+        exit()
+    print '* try again *'
