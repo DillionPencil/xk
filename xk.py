@@ -14,14 +14,24 @@ import re
 import time
 from PIL import Image
 import translate
+from bs4 import BeautifulSoup
+from datetime import datetime
 
 
-print 'Welcome to DillionWang\'s xk system (version:1.0 , 15.2.21)'
+print 'Welcome to DillionWang\'s xk system (version:2.0 , 15.2.21)'
 print ' ---*--- 猫猫抓课机 ---*--- '
 
-#ID = 'Your ID'
-#PW = 'Your Password'
-#class_code = 'Course Code'
+login_url = 'http://xk.fudan.edu.cn/xk'
+login_img_url = 'http://xk.fudan.edu.cn/xk/image.do'
+login_post_url = login_url + '/loginServlet'
+
+xk_url = 'http://xk.fudan.edu.cn/xk/input.jsp'
+xk_post_url = 'http://xk.fudan.edu.cn/xk/doSelectServlet'
+
+search_url = 'http://xk.fudan.edu.cn/xk/sekcoursepeos.jsp'
+
+headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1'
+}
 
 with open('./login_data.txt' , 'rb') as f:
     ID = f.readline()[0:11]
@@ -47,16 +57,14 @@ def get_img(imgurl):
     rand = translate.pic2words(image)
     return rand[0] + rand[1] + rand[2] + rand[3]
 
+
+# ****************** login *******************
+
 while True:
-    login_url = 'http://xk.fudan.edu.cn/xk'
-    login_img_url = 'http://xk.fudan.edu.cn/xk/image.do'
-    login_post_url = login_url + '/loginServlet'
-    
     response = urllib2.urlopen(login_url)
     
-    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1',
-               'Referer':'http://xk.fudan.edu.cn/xk'
-           }
+    headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:14.0) Gecko/20100101 Firefox/14.0.1'
+    }
     
     try:
         login_rand = get_img(login_img_url)
@@ -99,40 +107,89 @@ while True:
          f.close()
     break
 
-# -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
-
 print '* login successfully *'
 
+# ********* get the image ***********
+
 while True:
-    xk_url = 'http://xk.fudan.edu.cn/xk/input.jsp'
-    xk_post_url = 'http://xk.fudan.edu.cn/xk/doSelectServlet'
-    
+    img_pos = 2671
     response = urllib2.urlopen(xk_url)
     
     text = response.read()
-    img_pos = 2671
     token_number = text[2686:2690]
     xk_img_url = 'http://xk.fudan.edu.cn/xk/image.do?token=' + token_number
-    try :
+    try:
         xk_rand = get_img(xk_img_url)
         print 'xk_rand:' + xk_rand
-    except :
+        xk_post_data = {'token':token_number,
+                        'selectionId':str(class_code),
+                        'xklb':'ss',
+                        'rand':xk_rand
+        }
+        xk_post_data = urllib.urlencode(xk_post_data)
+        break
+    except:
         print '* bad image *'
+        print '* get the image again *'
+
+
+        
+#********** wait for the beginning time ************
+
+search_post_data = {'xkh':str(class_code),
+                    'submit':'Inquiry',
+                    'model':'空余人数查询'
+}
+search_post_data = urllib.urlencode(search_post_data)
+
+request = urllib2.Request(search_url , search_post_data , headers)
+
+i = 0
+
+while True:
     
-    xk_post_data = {'token':token_number,
-                    'selectionId':str(class_code),
-                    'xklb':'ss',
-                    'rand':xk_rand
-    }
-    xk_post_data = urllib.urlencode(xk_post_data)
+    print '%d : waiting for the beginning' % i
     
+    print datetime.now().strftime('%c')
+
+    time.sleep(0.3)
+
+    i += 1
+
+    response = urllib2.urlopen(request)
+
+    text = response.read()
+
+    '''
+    with open('./search_response.html' , 'wb') as f:
+        f.write(text)
+        f.close()
+    '''
+
+    soup = BeautifulSoup(text)
+
+    soup = soup.find_all('span')
+    if len(soup) < 14 :
+        print '* no avaliable course *'
+        print '* exiting the program *'
+        exit()
+    avaliable_num = int(soup[11].string)
+    restore_num = int(soup[12].string)
+    #print avaliable_num
+    #print restore_num
+    if (avaliable_num > restore_num):
+        break
+
+#*************** start *****************
+
+print '* start!!!!! *'
+
+while True:
     request = urllib2.Request(xk_post_url , xk_post_data , headers)
     response = urllib2.urlopen(request)
     
     text = response.read()
-    with open('./result.html' , 'wb') as f:
-        f.write(text)
-        f.close()
+
     alert_begin_pos = 298
     alert_end_pos = text.find('");' , 298)
     alert = text[alert_begin_pos : alert_end_pos]
@@ -150,4 +207,23 @@ while True:
     if alert.find(str(class_code)) != -1 :
         print 'exiting the program'
         exit()
-    print '* try again *'
+    print '* try again *'    
+    
+    response = urllib2.urlopen(xk_url)
+    
+    text = response.read()
+    token_number = text[2686:2690]
+    xk_img_url = 'http://xk.fudan.edu.cn/xk/image.do?token=' + token_number
+    try:
+        xk_rand = get_img(xk_img_url)
+        print 'xk_rand:' + xk_rand
+        xk_post_data = {'token':token_number,
+                        'selectionId':str(class_code),
+                        'xklb':'ss',
+                        'rand':xk_rand
+        }
+        xk_post_data = urllib.urlencode(xk_post_data)
+        break
+    except:
+        print '* bad image *'
+        print '* get the image again *'
